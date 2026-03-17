@@ -1,12 +1,15 @@
+# 💀 -> data fetch from different_files
+
 import streamlit as st
 import pandas as pd
 import preprocessor , helper
+import plotly.express as px
 
 # import data
 df = pd.read_csv('data/athlete_events.csv')
 region_df = pd.read_csv('data/noc_regions.csv')
 
-# this is the Filtered data on the basis of summer season
+# 💀 this is the completed Filtered data on the basis of summer season
 df = preprocessor.preprocess(df , region_df)
 
 # Configure page layout for better UI
@@ -20,11 +23,13 @@ user_menu = st.sidebar.radio(
     ('Medal Tally', 'Overall Analysis', 'Country Wise Analysis', 'Athlete Wise Analysis')
 )
 
+
 if user_menu == 'Medal Tally':
     # Main header with emoji
     st.title("🏅 Olympics Analysis Dashboard")
     st.markdown("---")
     st.sidebar.subheader("🏅 Medal Tally Filters")
+    # 💀 number of unique country and years are fetched
     years, regions = helper.country_year_list(df)
     
     # Create two columns for side-by-side dropdowns
@@ -49,14 +54,14 @@ if user_menu == 'Medal Tally':
     else:
         st.subheader(f"🏆 Medal Tally for {selected_country} in {selected_year}")
     
-    # Get medal tally data
+    # 💀 Get medal tally data fetched 
     medal_tally = helper.medal_tally(df, selected_country, selected_year)
     
     # Check if data exists before displaying
     if medal_tally.empty:
         st.warning("⚠️ No data available for the selected filters.")
     else:
-        # Display summary metrics in columns
+        # 💀 Display summary metrics in columns
         total_gold = medal_tally['Gold'].sum()
         total_silver = medal_tally['Silver'].sum()
         total_bronze = medal_tally['Bronze'].sum()
@@ -99,38 +104,72 @@ if user_menu == 'Medal Tally':
         )
       
 
-if user_menu == 'Overall Analysis' :
+if user_menu == 'Overall Analysis':
+    # 💀 overall analysis fetched
     unique_country = df['region'].unique().shape[0]
     edition = df['Year'].unique().shape[0]
     unique_cities = df['City'].unique().shape[0]
     unique_games = df['Sport'].unique().shape[0]
-    unique_athelete = df['Name'].unique().shape[0]
+    unique_athlete = df['Name'].unique().shape[0]
     unique_events = df['Event'].unique().shape[0]
 
-    st.title('Top Statisitcs')
-    col1 , col2 , col3 = st.columns(3)
-
-    with col1 :
-        st.header('Editions')
-        st.title( edition )
-    with col2 :
-        st.header('Hosts')
-        st.title( unique_cities )
-    with col3 :
-        st.header('Sports')
-        st.title( unique_games )
+    st.title("🏅 Overall Analysis Dashboard")
+    st.markdown("---")
     
-    col1 , col2 , col3 = st.columns(3)
-
-    with col1 :
-        st.header('Events')
-        st.title( unique_events )
-    with col2 :
-        st.header('Atheletes')
-        st.title( unique_athelete )
-    with col3 :
-        st.header('Nations')
-        st.title( unique_country )
-
-
-
+    # Key Statistics Section
+    st.subheader("📊 Key Statistics")
+    
+    # First row of metrics with icons
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(
+            label="🏛️ Editions",
+            value=edition,
+            help="Total number of Olympic editions held"
+        )
+    
+    with col2:
+        st.metric(
+            label="🏙️ Host Cities",
+            value=unique_cities,
+            help="Total number of unique host cities"
+        )
+    
+    with col3:
+        st.metric(
+            label="🎯 Sports",
+            value=unique_games,
+            help="Total number of unique sports categories"
+        )
+    
+    # Second row of metrics with icons
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(
+            label="🏃 Events",
+            value=unique_events,
+            help="Total number of unique events"
+        )
+    
+    with col2:
+        st.metric(
+            label="👥 Athletes",
+            value=unique_athlete,
+            help="Total number of unique athletes participated"
+        )
+    
+    with col3:
+        st.metric(
+            label="🌍 Nations",
+            value=unique_country,
+            help="Total number of participating nations"
+        )
+    
+    st.markdown("---")
+    
+    # 💀 Graph data fetch from the helper for Visualizations Section
+    st.subheader("📈 Participating Nations Over Time")
+    graph = helper.participating_nations_over_time(df)
+    st.plotly_chart(graph, use_container_width=True)

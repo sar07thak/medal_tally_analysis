@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import plotly.express as px
 
 
 def medal_tally( df , country , year ) :
@@ -38,3 +39,23 @@ def country_year_list( df ) :
 
     return years , regions 
 
+
+def participating_nations_over_time( df ):
+    # Step 1: Remove duplicates
+    new_df = df.drop_duplicates(['Year', 'region'])
+
+    # Step 2: Count countries per year
+    year_region = new_df.groupby('Year')['region'].size().reset_index()
+
+    # Rename column for clarity
+    year_region.rename(columns={'region': 'num_countries'}, inplace=True)
+
+    # Step 3: Plot using Plotly
+    fig = px.line(
+        year_region,
+        x='Year',
+        y='num_countries',
+        title='Number of Countries Participating in Olympics Over Years'
+    )
+
+    return fig
