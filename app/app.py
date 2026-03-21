@@ -23,7 +23,7 @@ user_menu = st.sidebar.radio(
     ('Medal Tally', 'Overall Analysis', 'Country Wise Analysis', 'Athlete Wise Analysis')
 )
 
-
+# 🧒 if user can select Medal Tally 
 if user_menu == 'Medal Tally':
     # Main header with emoji
     st.title("🏅 Olympics Analysis Dashboard")
@@ -42,8 +42,6 @@ if user_menu == 'Medal Tally':
     with col2:
         # Country selection with icon
         selected_country = st.selectbox("🌍 Country", regions)
-    
-    
     # Display section header with dynamic title
     if selected_year == 'overall' and selected_country == 'overall':
         st.subheader("🏆 Overall Medal Tally (All Years, All Countries)")
@@ -103,7 +101,7 @@ if user_menu == 'Medal Tally':
             hide_index=True  # Hide row indices for cleaner look
         )
       
-
+# 🧒 if user can select Overall Analysis 
 if user_menu == 'Overall Analysis':
     # 💀 overall analysis fetched
     unique_country = df['region'].unique().shape[0]
@@ -170,6 +168,10 @@ if user_menu == 'Overall Analysis':
     st.markdown("---")
     
     # 💀 Graph data fetch from the helper for Visualizations Section
-    st.subheader("📈 Participating Nations Over Time")
+    st.subheader("📈Participating Nations Over Time")
     graph = helper.participating_nations_over_time(df)
     st.plotly_chart(graph, use_container_width=True)
+
+    st.subheader("🎮Event held Over Time")
+    event_graph = helper.events_over_time( df )
+    st.plotly_chart( event_graph , use_container_width=True )

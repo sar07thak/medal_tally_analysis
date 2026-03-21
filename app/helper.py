@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-
+   
 def medal_tally( df , country , year ) :
     # update the problem and make sure it count as 1 medal
     medal_df = df.drop_duplicates(subset=['NOC','Games','Year','Season','City','Sport','Event','Medal','region','notes','Bronze','Gold','Silver'])
@@ -39,7 +39,6 @@ def country_year_list( df ) :
 
     return years , regions 
 
-
 def participating_nations_over_time( df ):
     # Step 1: Remove duplicates
     new_df = df.drop_duplicates(['Year', 'region'])
@@ -59,3 +58,21 @@ def participating_nations_over_time( df ):
     )
 
     return fig
+
+
+def events_over_time( df ):
+    new_df = df.drop_duplicates(['Year', 'Event'])
+
+    new_df = new_df.groupby('Year')['Event'].count().reset_index()
+
+    new_df.rename(columns={'Event': 'num_of_events'}, inplace=True)
+
+    fig = px.bar(
+    new_df,
+    x='Year',
+    y='num_of_events',
+    color='num_of_events',
+    title='Number of Events held in Olympics Over Years'
+    )   
+
+    return fig 
