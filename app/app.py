@@ -169,9 +169,14 @@ if user_menu == 'Overall Analysis':
     
     # 💀 Graph data fetch from the helper for Visualizations Section
     st.subheader("📈Participating Nations Over Time")
-    graph = helper.participating_nations_over_time(df)
+    graph = helper.participating_data_over_time(df , 'region')
     st.plotly_chart(graph, use_container_width=True)
 
+
     st.subheader("🎮Event held Over Time")
-    event_graph = helper.events_over_time( df )
+    event_graph = helper.participating_data_over_time( df , 'Event' )
+    st.plotly_chart( event_graph , use_container_width=True )
+
+    st.subheader("🧑Atheletes participate Over Time")
+    event_graph = helper.participating_data_over_time( df , 'Name' )
     st.plotly_chart( event_graph , use_container_width=True )

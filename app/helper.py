@@ -39,40 +39,42 @@ def country_year_list( df ) :
 
     return years , regions 
 
-def participating_nations_over_time( df ):
+def participating_data_over_time( df , value ):
     # Step 1: Remove duplicates
-    new_df = df.drop_duplicates(['Year', 'region'])
+    new_df = df.drop_duplicates(['Year', value ])
 
     # Step 2: Count countries per year
-    year_region = new_df.groupby('Year')['region'].size().reset_index()
+    year_wise_data = new_df.groupby('Year')[value].size().reset_index()
 
     # Rename column for clarity
-    year_region.rename(columns={'region': 'num_countries'}, inplace=True)
+    year_wise_data.rename(columns={value: f'num of {value}'}, inplace=True)
 
     # Step 3: Plot using Plotly
-    fig = px.line(
-        year_region,
-        x='Year',
-        y='num_countries',
-        title='Number of Countries Participating in Olympics Over Years'
-    )
+    if value == 'region' :
+        fig = px.line(
+            year_wise_data,
+            x='Year',
+            y=f'num of {value}',
+            title='Number of Countries Participating in Olympics Over Years'
+        )
+    elif value == 'Event' :
+        fig = px.bar(
+            year_wise_data,
+            x='Year',
+            y=f'num of {value}',
+            color=f'num of {value}',
+            title='Number of Countries Participating in Olympics Over Years'
+        )
+    elif value == 'Name' :
+        fig = px.area(
+            year_wise_data,
+            x='Year',
+            y=f'num of {value}',
+            title='Number of Countries Participating in Olympics Over Years'
+        )
+    
 
     return fig
 
 
-def events_over_time( df ):
-    new_df = df.drop_duplicates(['Year', 'Event'])
 
-    new_df = new_df.groupby('Year')['Event'].count().reset_index()
-
-    new_df.rename(columns={'Event': 'num_of_events'}, inplace=True)
-
-    fig = px.bar(
-    new_df,
-    x='Year',
-    y='num_of_events',
-    color='num_of_events',
-    title='Number of Events held in Olympics Over Years'
-    )   
-
-    return fig 
