@@ -4,11 +4,15 @@ __pycache__/
 *$py.class
 *.so
 .Python
+
+# Virtual Environment
 env/
 venv/
 ENV/
+.env
+
+# Build / Distribution
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
@@ -40,8 +44,8 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Heroku
-Procfile.local
+# Render
+.render
 
-# Data (optional - remove if you want to include data in repo)
-# data/*.csv
+# 🔥 IMPORTANT: Keep CSV (for your project)
+# data/*.csv   ← keep this commented

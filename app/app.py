@@ -1,13 +1,15 @@
 # 💀 -> data fetch from different_files
 
+import os
 import streamlit as st
 import pandas as pd
 import preprocessor , helper
 import plotly.express as px
 
 # import data
-df = pd.read_csv('data/athlete_events.csv')
-region_df = pd.read_csv('data/noc_regions.csv')
+base_path = os.path.dirname(os.path.dirname(__file__))
+df = pd.read_csv(os.path.join(base_path, 'data/athlete_events.csv'))
+region_df = pd.read_csv(os.path.join(base_path, 'data/noc_regions.csv'))
 
 # 💀 this is the completed Filtered data on the basis of summer season
 df = preprocessor.preprocess(df , region_df)
