@@ -169,14 +169,149 @@ if user_menu == 'Overall Analysis':
     
     # 💀 Graph data fetch from the helper for Visualizations Section
     st.subheader("📈Participating Nations Over Time")
-    graph = helper.participating_data_over_time(df , 'region')
-    st.plotly_chart(graph, use_container_width=True)
-
+    nation_over_time_graph = helper.participating_data_over_time(df , 'region')
+    st.plotly_chart( nation_over_time_graph , use_container_width=True)
 
     st.subheader("🎮Event held Over Time")
-    event_graph = helper.participating_data_over_time( df , 'Event' )
-    st.plotly_chart( event_graph , use_container_width=True )
+    event_over_time_graph = helper.participating_data_over_time( df , 'Event' )
+    st.plotly_chart( event_over_time_graph , use_container_width=True )
 
     st.subheader("🧑Atheletes participate Over Time")
-    event_graph = helper.participating_data_over_time( df , 'Name' )
-    st.plotly_chart( event_graph , use_container_width=True )
+    athelete_over_time_graph = helper.participating_data_over_time( df , 'Name' )
+    st.plotly_chart( athelete_over_time_graph , use_container_width=True )
+
+    st.subheader("🔥 Events per Sport over Years (Heatmap)")
+    heatmap_fig = helper.heatmap_event(df)
+    st.pyplot(heatmap_fig)
+
+    st.subheader("🏆 Most Successful Athletes")
+    st.markdown("Top 15 athletes by total medal count")
+    sport_list = df['Sport'].unique().tolist()
+    sport_list.sort()
+    sport_list.insert(0,'overall')
+    selected_sport = st.selectbox('select a sport ' , sport_list )
+    successful_athlete = helper.most_successfull_athelte(df,  selected_sport )
+
+    if successful_athlete.empty:
+        st.warning("⚠️ No data available")
+    else:
+        # Style the dataframe with medal color gradients
+        styled_df = successful_athlete.style.background_gradient(
+            subset=['Gold', 'Silver', 'Bronze', 'Total'],
+            cmap='YlOrBr'
+        ).format({
+            'Gold': '{:.0f}',
+            'Silver': '{:.0f}',
+            'Bronze': '{:.0f}',
+            'Total': '{:.0f}'
+        })
+
+        st.dataframe(
+            styled_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+# 🧒 if user can select Country Wise Analysis
+if user_menu == 'Country Wise Analysis':
+    st.title("🌍 Country Wise Analysis Dashboard")
+    st.markdown("---")
+    
+    # Country selection
+    st.sidebar.subheader("🌍 Country Filter")
+    years, regions = helper.country_year_list(df)
+    selected_country = st.sidebar.selectbox("Select Country", regions)
+    
+    # 1. Country-wise medal tally per year (line plot)
+    st.subheader("📈 Medal Tally Per Year")
+    if selected_country == 'overall':
+        st.markdown("Top 10 countries by total medals")
+    else:
+        st.markdown(f"Medal breakdown for **{selected_country}**")
+    
+    medal_tally_fig = helper.plot_country_medal_tally_per_year(df, selected_country)
+    st.plotly_chart(medal_tally_fig, use_container_width=True)
+    
+    # 2. Top Sports by Medal Count
+    st.subheader("🏅 Top Sports by Medal Count")
+    st.markdown("Sports where the country has won the most medals")
+    
+    sports_fig = helper.country_sport_heatmap(df, 'overall', selected_country)
+    if sports_fig:
+        st.plotly_chart(sports_fig, use_container_width=True)
+    else:
+        st.warning("⚠️ No data available")
+    
+    # 3. Most successful athletes (Top 10)
+    st.subheader("🏆 Top 10 Most Successful Athletes")
+    if selected_country == 'overall':
+        st.markdown("Top athletes across all countries")
+    else:
+        st.markdown(f"Top athletes from **{selected_country}**")
+    
+    top_athletes = helper.top_athletes_by_country(df, selected_country)
+    
+    if top_athletes.empty:
+        st.warning("⚠️ No data available")
+    else:
+        styled_athletes = top_athletes.style.background_gradient(
+            subset=['Gold', 'Silver', 'Bronze', 'Total'],
+            cmap='YlOrBr'
+        ).format({
+            'Gold': '{:.0f}',
+            'Silver': '{:.0f}',
+            'Bronze': '{:.0f}',
+            'Total': '{:.0f}'
+        })
+
+        st.dataframe(
+            styled_athletes,
+            use_container_width=True,
+            hide_index=True
+        )
+
+
+if user_menu == 'Athlete Wise Analysis':
+
+    options = ['All Athletes', 'Gold', 'Silver', 'Bronze']
+
+    selected = st.multiselect(
+        "Select categories to compare",
+        options,
+        default=['All Athletes']
+    )
+
+
+    st.title("Distribution of Age")
+    fig = helper.distribution_graph_plotly(df, selected)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+    st.title("🏃 Age Distribution by Sport")
+    st.markdown("---")
+    
+    # Get unique sports list
+    sports_list = df['Sport'].unique().tolist()
+    sports_list.sort()
+    sports_list.insert(0, 'overall')
+    
+    selected_sports = st.multiselect(
+        "Select Sports to Compare",
+        sports_list,
+        default=['overall']
+    )
+    
+    # If 'overall' is selected or no selection, show top 10 sports
+    if not selected_sports or 'overall' in selected_sports:
+        # Get top 10 sports by athlete count
+        df_temp = df.drop_duplicates(subset=['Name', 'Sport'])
+        sport_counts = df_temp.groupby('Sport').size().nlargest(10).reset_index(name='count')
+        selected_sports = sport_counts['Sport'].tolist()
+    
+    if selected_sports:
+        age_sport_fig = helper.age_sport_distribution_plotly(df, selected_sports)
+        st.plotly_chart(age_sport_fig, use_container_width=True)
+    else:
+        st.warning("⚠️ Please select at least one sport")
+
+
